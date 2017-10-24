@@ -29,6 +29,8 @@ trait Prob[T] extends Mesurable[T] {
 }
 
 object Prob {
+  def range(start: Int, end: Int): Prob[Int] = choose(start to end)
+
   def pure[T](e: T): Prob[T] = fromGet(() => e)
 
   def fromGet[T](_get: () => T): Prob[T] = {
@@ -38,7 +40,7 @@ object Prob {
   }
 
   implicit class DoubleProp(prob: Prob[Double]) {
-    val size = 1000000
+    val size = 1000001
 
     def esp: Double = prob.samples(size).sum / size
 
@@ -47,15 +49,15 @@ object Prob {
       prob.samples(size).map(_ - e).map(x => x * x).sum / size
     }
 
-    def std = math.sqrt(variance)
+    def std: Double = math.sqrt(variance)
 
     def median: Double = {
       val sortedProb: Seq[Double] = prob.samples(size).sorted
       val medSize: Int = size / 2
-      sortedProb.splitAt(medSize) match {
-        case (first, second) if first.size < second.size => second.head
-        case (first, second) if first.size > second.size => first.last
-        case (first, second) if first.size == second.size => (first.last + second.head) / 2
+      if(size % 2 == 1) {
+        sortedProb(medSize + 1)
+      } else {
+        (sortedProb(medSize + 1)  + sortedProb(medSize)) / 2
       }
     }
 
@@ -70,7 +72,8 @@ object Prob {
   def or[T](prods: Prob[T]*): Prob[T] = choose(prods).flatMap(identity)
 
   def generateNormal(mean: Double, std: Double): Prob[Double] = Prob.fromGet(() => util.Random.nextGaussian() * std + mean)
-  def generateUniform(min: Double, max: Double) = Prob.fromGet(() => util.Random.nextDouble() * max + min)
+  def generateUniform(min: Double, max: Double): Prob[Double] = Prob.fromGet(() => util.Random.nextDouble() * (max - min) + min)
+  //cela serait pas mieux de faire l'inverse ?
   val normal: Prob[Double] = generateNormal(0, 1)
   val uniform: Prob[Double] = generateUniform(0, 1)
 
