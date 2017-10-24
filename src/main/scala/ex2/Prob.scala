@@ -67,11 +67,57 @@ object Prob {
 
 
   def choose[T](xs: Seq[T]): Prob[T] = Prob.fromGet(() => xs(Random.nextInt(xs.size)))
-  def or[T](prods: Prob[T]*): Prob[T] = choose(prods).flatMap(identity)
+  def or[T](probs: Prob[T]*): Prob[T] = choose(probs).flatMap(identity)
 
   def generateNormal(mean: Double, std: Double): Prob[Double] = Prob.fromGet(() => util.Random.nextGaussian() * std + mean)
   def generateUniform(min: Double, max: Double) = Prob.fromGet(() => util.Random.nextDouble() * max + min)
   val normal: Prob[Double] = generateNormal(0, 1)
   val uniform: Prob[Double] = generateUniform(0, 1)
 
+}
+
+
+/**
+  * test if scala worksheet doesn't work
+  */
+object TestProb extends App{
+import Prob.choose
+  import scala.util.Random.nextDouble
+
+  //De = {DeValue(1), ..., DeValue(6)}
+  sealed trait De{
+    def value: Int
+  }
+  case class DeValue(i:Int) extends De {
+    require(i>0 && i<7)
+    override def value: Int = i
+  }
+
+  //Piece = {Pile, Face}
+  sealed trait Piece
+  case object Pile extends Piece
+  case object Face extends Piece
+
+  val probDe: Prob[De] = choose((1 to 6).map(DeValue.apply))
+
+  val probPiece: Prob[Piece] = Prob.fromGet(() => if(nextDouble()<0.5) Pile else Face)
+
+  def gainPiece(p:Piece): Int = p match {
+    case Pile => 1
+    case Face => 0
+  }
+
+  def f(de:De): Prob[Int] = Prob.fromGet(() => de match {
+    case DeValue(imp) if imp%2==1 => probPiece.map(gainPiece)
+    case DeValue(pair) => probPiece.map(p => gainPiece(p) + pair)
+  }).flatMap(identity)
+
+  val gains: Prob[Int] = probDe.flatMap(f)
+  val prob1 = gains.prob(_==1)
+  val prob0 = gains.prob(_==0)
+  val prob7 = gains.prob(_==7)
+
+  println(s"P(X=1) = $prob1")
+  println(s"P(X=0) = $prob0")
+  println(s"P(X=7) = $prob7")
 }
