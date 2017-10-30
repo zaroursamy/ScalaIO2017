@@ -39,27 +39,17 @@ val densityX: Map[Int, Double] = X.density()
 densityX.map(_._2).sum
 //=> 0.9999999999999999
 
-////Piece = {Pile, Face}
-//sealed trait Piece
-//case object Pile extends Piece
-//case object Face extends Piece
-//
-//val probPiece: Prob[Piece] = Prob.fromGet(() => if(nextDouble()<0.5) Pile else Face)
-//
-//val densityPiece: Map[Piece, Double] = probPiece.density()
-////=> Map(Face -> 0.498954, Pile -> 0.501046)
-//
-//def gainPiece(p:Piece): Int = p match {
-//  case Pile => 1
-//  case Face => 0
-//}
-//val probGain: Prob[Int] = probPiece.map(gainPiece)
-//val prob1euro: Double = probGain.prob(_==1)
-////=> 0.499237
-//
-//val distribNormal: Map[Double, Double] = Prob.generateNormal(30, 5).density((d:Double) => math.round(d))
-//distribNormal.filter(x => x._1>=25 && x._1<=35).values.toSeq.sum
-////=> 0.7282919999999999
-//
-//
-//def variableRandom[Omega, E](prob:Prob[Omega],  X: Omega => E):Prob[E] = prob.map(X)
+
+val densityPiece: Map[Piece, Double] = probPiece.density()
+//=> Map(Face -> 0.498954, Pile -> 0.501046)
+
+val probGain: Prob[Int] = probPiece.map(gainPiece)
+val prob1euro: Double = probGain.prob(_==1)
+//=> 0.499237
+
+val distribNormal: Map[Double, Double] = Prob.generateNormal(30, 5).density((d:Double) => math.round(d))
+distribNormal.filter(x => x._1>=25 && x._1<=35).values.toSeq.sum
+//=> 0.7282919999999999
+
+
+def variableRandom[Omega, E](prob:Prob[Omega],  X: Omega => E):Prob[E] = prob.map(X)

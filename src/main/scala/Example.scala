@@ -1,4 +1,3 @@
-import ex1.Mesurable
 import ex2.Prob
 import ex2.Prob._
 
@@ -11,9 +10,6 @@ object Bucketizer {
     override def toBucket(t: T): T = t
   }
 }
-
-
-
 
 sealed trait OmegaDe
 

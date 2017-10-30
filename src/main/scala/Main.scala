@@ -1,4 +1,3 @@
-import com.cra.figaro.algorithm.Values
 import com.cra.figaro.algorithm.factored.VariableElimination
 import com.cra.figaro.algorithm.learning.EMWithBP
 import com.cra.figaro.algorithm.sampling.MetropolisHastings
@@ -10,7 +9,6 @@ import com.cra.figaro.patterns.learning.{ModelParameters, ParameterCollection}
 /**
   * Created by zarour on 03/10/2017.
   */
-
 
 object ExampleFunctor {
   def main(args: Array[String]): Unit = {
@@ -89,32 +87,6 @@ object ExampleFunctor {
     exampleFunctor()
   }
 }
-
-object ExampleConcret {
-  case class Data(month: Int, temps: String, isParap: Boolean)
-
-  def main(args: Array[String]): Unit = {
-
-
-    var obs: List[Data] = List(Data(1, "beau", false),
-      Data(1, "beau", false),
-      Data(1, "mauvais", true),
-      Data(6, "beau", false))
-
-    var param_isParap = obs.count(_.isParap == true).toDouble / obs.size
-    val isParapSorted = Flip(param_isParap)
-
-
-
-    println("after data " + VariableElimination.probability(isParapSorted, true))
-
-
-  }
-}
-
-
-
-
 
 object FairCoinTest extends App{
 

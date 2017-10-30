@@ -1,28 +1,13 @@
 package ex5
 
-import com.cra.figaro.algorithm.Values
-import com.cra.figaro.algorithm.factored.VariableElimination
 import com.cra.figaro.algorithm.factored.beliefpropagation.BeliefPropagation
-import com.cra.figaro.algorithm.sampling.MetropolisHastings
 import com.cra.figaro.language._
-import com.cra.figaro.library.compound.{If, ^^}
-import ex2.Prob
 
 sealed trait Piece
 case object Pile extends Piece
 case object Face extends Piece
 
-
-object Metropolis extends App{
-
-
-
-
-
-}
 object Figaro extends App {
-
-
 
   val piece: Element[Piece] = Flip(0.5).map(b => if (b) Pile else Face)
 
@@ -53,36 +38,4 @@ object Figaro extends App {
 
 }
 
-object Conditionnel{
 
-  def main(args: Array[String]): Unit = {
-
-    def resTest(b:Boolean) = if(b) 'positif else 'negatif
-
-    // 99% de chance d'être sain
-    val probMalade: Element[Boolean] = Flip(0.001)
-
-    // malade => 90% de chance d'etre positif. Sain => 3% de chance d'etre positif
-    val probTest: If[Boolean] = If(probMalade, Flip(0.9), Flip(0.03))
-
-    /**
-      * probMalade.flatMap{ m =>
-      if(m == 'malade) Flip(0.9).map(resTest) else Flip(0.03).map(resTest)
-    }
-      */
-
-    val algMalade = BeliefPropagation(10, probMalade)
-    val algTest = BeliefPropagation(10, probTest)
-
-    algMalade.start()
-    algTest.start()
-
-    println(s"P(malade) = ${algMalade.probability(probMalade, true)}")
-
-    probTest.observe(true)
-    println("P(malade | positif) = " + algTest.probability(probMalade,true))
-
-    algMalade.kill()
-    algTest.kill()
-  }
-}
