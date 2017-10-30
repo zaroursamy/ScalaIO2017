@@ -1,5 +1,7 @@
+import com.cra.figaro.algorithm.Values
 import com.cra.figaro.algorithm.factored.VariableElimination
 import com.cra.figaro.algorithm.learning.EMWithBP
+import com.cra.figaro.algorithm.sampling.MetropolisHastings
 import com.cra.figaro.language._
 import com.cra.figaro.library.atomic.continuous.{AtomicBeta, Beta, Normal}
 import com.cra.figaro.library.compound.If
@@ -144,6 +146,9 @@ object FairCoinTest extends App{
     val fairness: AtomicBeta = Beta(2.0, 2.0)("fairness", params)
     val model: Trials = new Trials(params.priorParameters)
 
+   println("Probabilité que le paramètre soit entre 0.4 et 0.6 = " + MetropolisHastings.probability(fairness, (d:Double) => d>0.4 && d<0.6))
+
+
     data zip model.trials foreach {
       (datum: (Char, Flip)) => if (datum._1 == 'H') datum._2.observe(true) else datum._2.observe(false)
     }
@@ -159,6 +164,9 @@ object FairCoinTest extends App{
      */
     println("The probability of a coin with this fairness showing 'heads' is: ")
     println(params.posteriorParameters.get("fairness"))
+
+
+    System.exit(0)
 
     val t1 = Flip(params.posteriorParameters.get("fairness"))
     val t2 = Flip(params.posteriorParameters.get("fairness"))
@@ -179,58 +187,3 @@ object FairCoinTest extends App{
 }
 
 
-
-object Samia{
-
-  def main(args: Array[String]): Unit = {
-
-    val probNutella = Flip(0.9)
-
-    def fNutella(b:Boolean) = if(b) Flip(0.7) else Flip(0.05)
-
-    val func: Element[AtomicFlip] = probNutella.map(fNutella)
-
-    val monad = probNutella.flatMap(fNutella)
-
-    func.flatMap(flip => flip match {
-      case x => x
-    })
-
-    println(VariableElimination.probability(monad, true))
-
-
-
-
-  }
-}
-
-
-
-
-trait Magma[T]{
-  def *(a:T, b:T): T
-}
-
-trait Monoid[T] extends Magma[T]{
-  def e: T
-  def assoc(a:T, b:T, c:T): Boolean = *(*(a,b), c) == *(a, *(b,c))
-
-}
-
-object Monoid{
-
-  implicit val monoidString = new Monoid[String] {
-    override def e: String = ""
-
-    override def *(a: String, b: String): String = s"$a$b"
-  }
-
-  implicit val monoidInt = new Monoid[Int] {
-    override def e: Int = 1
-
-    override def *(a: Int, b: Int): Int = a*b
-  }
-
-
-
-}

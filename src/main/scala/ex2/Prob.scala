@@ -47,7 +47,7 @@ object Prob {
   def range(start: Int, end: Int): Prob[Int] = choose(start to end)
 
 
-  implicit class DoubleProp(prob: Prob[Double]) {
+  implicit class DoubleProb(prob: Prob[Double]) {
     val size = 1000001
 
     def esp: Double = prob.samples(size).sum / size
@@ -62,17 +62,16 @@ object Prob {
     def median: Double = {
       val sortedProb: Seq[Double] = prob.samples(size).sorted
       val medSize: Int = size / 2
-      if (size % 2 == 1) {
-        sortedProb(medSize + 1)
-      } else {
-        (sortedProb(medSize + 1) + sortedProb(medSize)) / 2
-      }
+      if (size % 2 == 1) sortedProb(medSize + 1) else (sortedProb(medSize + 1) + sortedProb(medSize)) / 2
     }
 
-    def asym: Double = {
-      val (e, s) = (esp, std)
-      prob.samples(size).map(x => math.pow((x - e) / s, 3)).sum / size
+    def momentCentreReduit(ordre: Int) = {
+      val (e,s) = (esp, std)
+      prob.samples(size).map(x => math.pow((x - e) / s, ordre)).sum / size
     }
+    def asym: Double = momentCentreReduit(3)
+
+    def kurtosis: Double = momentCentreReduit(4)
   }
 
 

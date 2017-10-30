@@ -4,6 +4,7 @@ package ex1
 trait Mesurable[T] {
   def mes(a: T): Double
   def mesSeq(seq: T*): Double = seq.distinct.map(mes).sum
+
 }
 
 object Mesurable {
