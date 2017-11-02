@@ -24,6 +24,8 @@ trait Prob[T] extends Mesurable[T] {
     d(true)
   }
 
+  require(prob((a:T) => true) + prob((a:T) => false) == 1)
+
   override def mes(a: T): Double = prob(_ == a)
 
 }
